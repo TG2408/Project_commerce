@@ -1,0 +1,35 @@
+{% extends 'auctions/layout.html' %}
+
+{% load static %}
+
+    {% block body %}
+
+        <h1>{{listing.title}}</h1>
+        <img src = "/static/auctions/{{listing.imagename}}" style="height: 6cm;">
+        <h3>Inital Price - $ {{listing.price}}</h3>
+        <h3>Discription - {{listing.discription}}</h3>
+        <h6>Last bid - {{listing_bid.bid}}</h6>
+        <div>
+            {% if user.is_authenticated %}
+                
+                {% if listing.masteruser == user.username %}
+                    <h1>
+                        <a href="{% url 'closed_listing' listing.title %}">Close Listing</a>
+                    </h1>
+                {% else %}
+                    <form action="{% url 'listing_page' listing.title %}" method="POST">
+                        {% csrf_token %}
+                        <input type="number" placeholder="bid here" min="{{make_bid}}" name="latest_bid" >
+                        <input type="text" placeholder="comment here" name="latest_comment" >
+                        <input type="submit" value="BID" >
+                    </form>
+                {% endif %}
+            
+            {% else %}
+                <h6>
+                    <a href="{% url 'login' %}">Sign In to Place Bid & comment</a>
+                </h6>
+            {% endif %}
+
+        </div>    
+    {% endblock %}

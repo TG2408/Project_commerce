@@ -1,0 +1,18 @@
+{% extends 'auctions/layout.html' %}
+
+{% block body %}
+    <h1>Categories</h1>
+    <form action="{% url 'categories' %}" method="POST">
+        {% csrf_token %}
+        <input type="radio" id="Fashion" name="category" value="Fashion">
+        <label for="Fashion">Fashion</label><br>
+        <input type="radio" id="Toys" name="category" value="Toys">
+        <label for="Toys">Toys</label><br>
+        <input type="radio" id="Electronics" name="category" value="Electronics">
+        <label for="Electronics">Electronics</label><br>
+        <input type="radio" id="books" name="category" value="Books">
+        <label for="books">books</label><br>
+        <input type="submit" value="Submit">
+    </form>
+
+{% endblock %}
