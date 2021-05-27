@@ -23,6 +23,12 @@
                         <input type="text" placeholder="comment here" name="latest_comment" >
                         <input type="submit" value="BID" >
                     </form>
+                    <h4>Comments - </h4>
+
+                    {% for comments in user_comments %}
+                        <small>{{comments.username}} - </small> <b>{{comments.comment}} </b><br>
+                    {% endfor %}
+
                 {% endif %}
             
             {% else %}

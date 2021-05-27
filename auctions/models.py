@@ -30,10 +30,9 @@ class Bid(models.Model):
     bids_listing = models.ForeignKey(Listing,on_delete=models.CASCADE, related_name="relate_bid")
     
     
-
-
 class Comment(models.Model):
-    comment = models.CharField(max_length=200 ,default=None)
-    auction_Listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name="relate_comments")
+    username = models.CharField(max_length=100, blank=True)
+    comment = models.CharField(max_length=200 ,default=None , blank=True)
+    comment_listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name="relate_comments")
 
 

@@ -124,9 +124,15 @@ def listing_page(request, name):
     if request.method == "POST":
         current_user = request.user # asking current user
         
+        latest_comment = request.POST["latest_comment"]
         latest_bid = request.POST["latest_bid"]
         listing = Listing.objects.get(pk = name)
-        Bid(username = current_user,bid = latest_bid, bids_listing = listing ).save()
+        
+        Bid(username = current_user, bid = latest_bid, bids_listing = listing ).save()
+        
+        if latest_comment is not None:
+            Comment(username = current_user,comment = latest_comment ,comment_listing = listing).save()
+
         listing_bid = listing.relate_bid.all().last()
         make_bid = listing_bid.bid + 1
     
@@ -135,6 +141,7 @@ def listing_page(request, name):
             "listing_comments" : listing.relate_comments.all()  ,
             "listing_bid" : listing_bid ,
             "make_bid" : make_bid ,
+            "user_comments" : Comment.objects.all()
         }) 
 
     else :
@@ -148,6 +155,7 @@ def listing_page(request, name):
             "listing_comments" : listing.relate_comments.all()  ,
             "listing_bid" : listing_bid ,
             "make_bid" : make_bid ,
+            "user_comments" : Comment.objects.all()
         })
 
 #Close Listing
