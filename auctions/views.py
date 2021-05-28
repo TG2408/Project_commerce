@@ -136,12 +136,15 @@ def listing_page(request, name):
         listing_bid = listing.relate_bid.all().last()
         make_bid = listing_bid.bid + 1
     
+        listing_watchlater = listing.relate_watchlater.filter(username = current_user)
+
         return render(request, "auctions/listing.html", {
             "listing" : listing ,
             "listing_comments" : listing.relate_comments.all()  ,
             "listing_bid" : listing_bid ,
             "make_bid" : make_bid ,
-            "user_comments" : Comment.objects.all()
+            "user_comments" : Comment.objects.all(),
+            "listingwatchlater" : listing_watchlater
         }) 
 
     else :
@@ -150,12 +153,15 @@ def listing_page(request, name):
         listing_bid = listing.relate_bid.all().last()
         make_bid = listing_bid.bid + 1
 
+        listing_watchlater = listing.relate_watchlater.filter(username = current_user)
+
         return render(request, "auctions/listing.html", {
             "listing" : listing ,
             "listing_comments" : listing.relate_comments.all()  ,
             "listing_bid" : listing_bid ,
             "make_bid" : make_bid ,
-            "user_comments" : Comment.objects.all()
+            "user_comments" : Comment.objects.all(),
+            "listingwatchlater" : listing_watchlater
         })
 
 #Close Listing
@@ -182,7 +188,16 @@ def categories(request):
 @login_required(login_url='/login')
 def watchlater(request):
     if request.method == "POST":
-        pass
+        current_user = request.user
+        
+        listing_detail = request.POST["listing_detail"]
+        
+        temp = listing_detail.relate_watchlater.filter(username = current_user)
+        if temp is not None:
+            temp.delete()
+        else:
+            Watchlater(username = current_user, watchlater_listing = listing_detail)
+
     else:
         current_user = request.user
         watchlater_list = Watchlater.objects.filter(username = current_user)
