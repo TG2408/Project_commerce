@@ -1,6 +1,7 @@
 from typing import ByteString
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models.fields.related import ForeignKey
 
 
 class User(AbstractUser):
@@ -35,4 +36,8 @@ class Comment(models.Model):
     comment = models.CharField(max_length=200 ,default=None , blank=True)
     comment_listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name="relate_comments")
 
+class Watchlater(models.Model):
+    username = models.CharField(max_length=100)
+    watchlater_listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name="relate_watchlater")
 
+    

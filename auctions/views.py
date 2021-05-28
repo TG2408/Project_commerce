@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User, Listing, Bid, Comment
+from .models import User, Listing, Bid, Comment, Watchlater
 
 from django import forms
 import urllib.request,os
@@ -167,7 +167,7 @@ def closed_listing(request, name):
         "listing" : Listing.objects.all()
     })
     
-#Listing based on  categories
+# Listing based on categories
 @login_required(login_url='/login')
 def categories(request):
     if request.method == "POST":
@@ -177,3 +177,20 @@ def categories(request):
         })
     else : 
         return render(request, "auctions/categories.html")
+
+# Watchlater of each user
+@login_required(login_url='/login')
+def watchlater(request):
+    if request.method == "POST":
+        pass
+    else:
+        current_user = request.user
+        watchlater_list = Watchlater.objects.filter(username = current_user)
+        
+        l = []
+        for list in watchlater_list:
+            l.append(list.watchlater_listing)
+
+        return render(request, "auctions/index.html",{
+            "listing" : l 
+        })
