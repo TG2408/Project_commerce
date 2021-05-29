@@ -190,14 +190,18 @@ def watchlater(request):
     if request.method == "POST":
         current_user = request.user
         
-        listing_detail = request.POST["listing_detail"]
+        listing_title = request.POST["listing_title"]
         
-        temp = listing_detail.relate_watchlater.filter(username = current_user)
+        listing_detail = Listing.objects.get(title = listing_title)
+
+        temp = listing_detail.relate_watchlater.filter(username = current_user).first()
         if temp is not None:
             temp.delete()
+            return HttpResponse("remove from watchlater")
         else:
-            Watchlater(username = current_user, watchlater_listing = listing_detail)
-
+            Watchlater(username = current_user, watchlater_listing = listing_detail).save()
+            return HttpResponse("added to watchlater")
+       
     else:
         current_user = request.user
         watchlater_list = Watchlater.objects.filter(username = current_user)

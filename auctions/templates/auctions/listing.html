@@ -30,13 +30,19 @@
                     {% endfor %}
 
                     {% if listingwatchlater %}
-                        <button type="submit" formaction="{% url 'watchlater' %}" formmethod="POST" value="{{listing}}" name="listing_detail">
-                            <h5>Remove From watchlater</h5>
-                        </button>
+                        <form action="{% url 'watchlater' %}" method="POST">
+                            {% csrf_token %}
+                                <button type="submit" value="{{listing.title}}" name="listing_title">
+                                    <h5>Remove From watchlater</h5>
+                                </button>
+                        </form>
                     {% else %}
-                        <button type="submit" formaction="{% url 'watchlater' %}" formmethod="POST" value="{{listing}}" name="listing_detail">
-                            <h5>Add to watchlater</h5>
-                        </button>
+                        <form action="{% url 'watchlater' %}" method="POST">
+                            {% csrf_token %}
+                                <button type="submit" value="{{listing.title}}" name="listing_title">
+                                    <h5>Add to watchlater</h5>
+                                </button>
+                            </form>
                     {% endif %}
 
                 {% endif %}
