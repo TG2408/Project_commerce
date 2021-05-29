@@ -6,9 +6,9 @@
     
         <h1>{{listing.title}}</h1>
         <img src = "/static/auctions/{{listing.imagename}}" style="height: 6cm;">
-        <h3>Inital Price - $ {{listing.price}}</h3>
-        <h3>Discription - {{listing.discription}}</h3>
-        <h6>Last bid - {{listing_bid.bid}}</h6>
+        <h5>Inital Price - $ {{listing.price}}</h5>
+        <h5>Discription - {{listing.discription}}</h5>
+        <h5>Latest bid - $ {{listing_bid.bid}}</h5>
         <div>
             {% if user.is_authenticated %}
                 
@@ -20,10 +20,9 @@
                     <form action="{% url 'listing_page' listing.title %}" method="POST">
                         {% csrf_token %}
                         <input type="number" placeholder="bid here" min="{{make_bid}}" name="latest_bid" >
-                        <input type="text" placeholder="comment here" name="latest_comment" >
+                        <input type="text" placeholder="comment here" name="latest_comment" empty_value = "None">
                         <input type="submit" value="BID" >
                     </form>
-                    <h4>Comments - </h4>
 
                     {% for comments in user_comments %}
                         <small>{{comments.username}} - </small> <b>{{comments.comment}} </b><br>

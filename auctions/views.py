@@ -5,21 +5,21 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User, Listing, Bid, Comment, Watchlater
-
-from django import forms
 import urllib.request,os
+from django import forms
 from django.contrib.auth.decorators import login_required
 
+from .models import User, Listing, Bid, Comment, Watchlater
 
 
+# Index page definations
 def index(request):
     return render(request, "auctions/index.html",{
         "listing" : Listing.objects.all()
     })
 
 
-
+# Login page definations
 def login_view(request):
     if request.method == "POST":
 
@@ -40,11 +40,13 @@ def login_view(request):
         return render(request, "auctions/login.html")
 
 
+# User Logout Definations
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse("index"))
 
 
+# User registration definations
 def register(request):
     if request.method == "POST":
         username = request.POST["username"]
@@ -72,18 +74,20 @@ def register(request):
         return render(request, "auctions/register.html")
 
 
+# Defining django form(dynamic) directly using Listing Model
 class newform(forms.ModelForm):
     class Meta:
         model = Listing
         fields = ['title', 'discription', 'price', 'category', 'imagelink', 'active']
 
+
 # Create new listing
-@login_required(login_url='http://127.0.0.1:8000/login')
+@login_required(login_url='http://127.0.0.1:8000/login')  # Making Login necessary for using this defination
 def new_listing(request):
-    current_user = request.user
+    current_user = request.user                           # requesting for current loginned user 
     
     if request.method == "POST":
-        form = newform(request.POST)
+        form = newform(request.POST)                      # Requesting for form data
         if form.is_valid():
             title = form.cleaned_data['title']
             discription = form.cleaned_data['discription']
@@ -94,9 +98,11 @@ def new_listing(request):
                         
             imagename = f"{title}.jpg"
 
+            # making object or storing data in Listing model
             new_listing = Listing(title = title, discription = discription, price = price, category = category, imagename= imagename, imagelink = imagelink, active =active, masteruser = current_user.username,)
             new_listing.save()
             
+            # making object or storing data in Bid model
             Bid(username = current_user.username, bid = price , bids_listing = new_listing ).save()
 
             if imagelink is not None:
@@ -104,7 +110,7 @@ def new_listing(request):
 
                 # Seting path for image download
                 fullfilename = os.path.join("auctions/static/auctions", imagename)  
-                 # Downloading image at above path
+                # Downloading image at above path
                 urllib.request.urlretrieve(imagelink ,fullfilename)         
             
             return render(request, "auctions/index.html",{
@@ -115,14 +121,14 @@ def new_listing(request):
 
     else:
         return render(request, "auctions/new_listing.html", {
-            "form" : newform()
+            "form" : newform()                                        # sending newform to create_listing.html
         })
 
 # Listing page defination
 @login_required(login_url='/login')
 def listing_page(request, name):
     if request.method == "POST":
-        current_user = request.user # asking current user
+        current_user = request.user
         
         latest_comment = request.POST["latest_comment"]
         latest_bid = request.POST["latest_bid"]
@@ -130,7 +136,7 @@ def listing_page(request, name):
         
         Bid(username = current_user, bid = latest_bid, bids_listing = listing ).save()
         
-        if latest_comment is not None:
+        if latest_comment != "":
             Comment(username = current_user,comment = latest_comment ,comment_listing = listing).save()
 
         listing_bid = listing.relate_bid.all().last()
@@ -155,14 +161,24 @@ def listing_page(request, name):
 
         listing_watchlater = listing.relate_watchlater.filter(username = current_user)
 
-        return render(request, "auctions/listing.html", {
-            "listing" : listing ,
-            "listing_comments" : listing.relate_comments.all()  ,
-            "listing_bid" : listing_bid ,
-            "make_bid" : make_bid ,
-            "user_comments" : Comment.objects.all(),
-            "listingwatchlater" : listing_watchlater
-        })
+        if listing.active == False:
+            if current_user == listing_bid.username:
+                return render(request, "auctions/listing.html", {
+                    "listing" : listing,
+                    "winning_bid" : listing_bid       
+                })
+            else:
+                return HttpResponse(f"{listing_bid.username} won this")
+        else:
+            return render(request, "auctions/listing.html", {
+                "listing" : listing ,
+                "listing_comments" : listing.relate_comments.all()  ,
+                "listing_bid" : listing_bid ,
+                "make_bid" : make_bid ,
+                "user_comments" : Comment.objects.all(),
+                "listingwatchlater" : listing_watchlater
+            })
+
 
 #Close Listing
 def closed_listing(request, name):
@@ -173,6 +189,7 @@ def closed_listing(request, name):
         "listing" : Listing.objects.all()
     })
     
+
 # Listing based on categories
 @login_required(login_url='/login')
 def categories(request):
@@ -183,6 +200,7 @@ def categories(request):
         })
     else : 
         return render(request, "auctions/categories.html")
+
 
 # Watchlater of each user
 @login_required(login_url='/login')

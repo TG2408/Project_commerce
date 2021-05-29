@@ -26,14 +26,14 @@ class Listing(models.Model):
 
 
 class Bid(models.Model):
-    username = models.CharField(max_length=100, blank=True)
+    username = models.CharField(max_length=100)
     bid = models.IntegerField(default=0)
     bids_listing = models.ForeignKey(Listing,on_delete=models.CASCADE, related_name="relate_bid")
     
     
 class Comment(models.Model):
-    username = models.CharField(max_length=100, blank=True)
-    comment = models.CharField(max_length=200 ,default=None , blank=True)
+    username = models.CharField(max_length=100)
+    comment = models.CharField(max_length=200)
     comment_listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name="relate_comments")
 
 class Watchlater(models.Model):
