@@ -195,12 +195,33 @@ def watchlater(request):
         listing_detail = Listing.objects.get(title = listing_title)
 
         temp = listing_detail.relate_watchlater.filter(username = current_user).first()
+
         if temp is not None:
             temp.delete()
-            return HttpResponse("remove from watchlater")
+            listing_bid = listing_detail.relate_bid.all().last()
+            make_bid = listing_bid.bid + 1
+            listing_watchlater = listing_detail.relate_watchlater.filter(username = current_user)
+            return render(request, "auctions/listing.html", {
+                "listing" : listing_detail ,
+                "listing_comments" : listing_detail.relate_comments.all()  ,
+                "listing_bid" : listing_bid ,
+                "make_bid" : make_bid ,
+                "listingwatchlater" : listing_watchlater,
+                "user_comments" : Comment.objects.all(),                
+            })
         else:
             Watchlater(username = current_user, watchlater_listing = listing_detail).save()
-            return HttpResponse("added to watchlater")
+            listing_bid = listing_detail.relate_bid.all().last()
+            make_bid = listing_bid.bid + 1
+            listing_watchlater = listing_detail.relate_watchlater.filter(username = current_user)
+            return render(request, "auctions/listing.html", {
+                "listing" : listing_detail ,
+                "listing_comments" : listing_detail.relate_comments.all()  ,
+                "listing_bid" : listing_bid ,
+                "make_bid" : make_bid ,
+                "listingwatchlater" : listing_watchlater,
+                "user_comments" : Comment.objects.all(),                
+            })
        
     else:
         current_user = request.user
