@@ -73,6 +73,10 @@ def register(request):
     else:
         return render(request, "auctions/register.html")
 
+#testing
+# category = models.CharField(choices=categories, default="All", max_length=100, blank=True)
+# imagelink = models.URLField(max_length=250, blank=True)
+
 
 # Defining django form(dynamic) directly using Listing Model
 class newform(forms.ModelForm):
