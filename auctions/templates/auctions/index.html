@@ -6,14 +6,14 @@
     
     <table>
         {% for list in listing %}
-            {% if list.active %}
+            
                 <td style="max-width: 7cm; padding-left: 1cm;">
                     <img src = "static/auctions/{{list.imagename}}" style="height: 6cm; max-width: 6cm;" alt=""><br>
                     <a href="{% url 'listing_page' list.title %}" style="font-size: 40px;color: black;">{{list.title}}</a><br>
                     <b>Discription</b> - {{list.discription}}<br>
-                    <b>Price</b> - ${{list.price}}<br>
+                    <b>Latest Bid</b> - ${{list.current_bid}}<br>
                 </td>
-            {% endif %}
+            
 
         {% endfor %}
 

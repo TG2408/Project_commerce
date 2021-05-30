@@ -73,10 +73,6 @@ def register(request):
     else:
         return render(request, "auctions/register.html")
 
-#testing
-# category = models.CharField(choices=categories, default="All", max_length=100, blank=True)
-# imagelink = models.URLField(max_length=250, blank=True)
-
 
 # Defining django form(dynamic) directly using Listing Model
 class newform(forms.ModelForm):
@@ -103,19 +99,15 @@ def new_listing(request):
             imagename = f"{title}.jpg"
 
             # making object or storing data in Listing model
-            new_listing = Listing(title = title, discription = discription, price = price, category = category, imagename= imagename, imagelink = imagelink, active =active, masteruser = current_user.username,)
+            new_listing = Listing(title = title, discription = discription, price = price, current_bid = price, category = category, imagename= imagename, imagelink = imagelink, active =active, masteruser = current_user.username)
             new_listing.save()
             
             # making object or storing data in Bid model
             Bid(username = current_user.username, bid = price , bids_listing = new_listing ).save()
 
-            if imagelink is not None:
-                # Downloading image in static folder of auctions
-
-                # Seting path for image download
-                fullfilename = os.path.join("auctions/static/auctions", imagename)  
-                # Downloading image at above path
-                urllib.request.urlretrieve(imagelink ,fullfilename)         
+            if imagelink is not None:                                                    # Downloading image in static folder of auctions
+                fullfilename = os.path.join("auctions/static/auctions", imagename)       # Seting path for image download  
+                urllib.request.urlretrieve(imagelink ,fullfilename)                      # Downloading image at above path
             
             return render(request, "auctions/index.html",{
                 "listing" : Listing.objects.all()
@@ -137,16 +129,18 @@ def listing_page(request, name):
         latest_comment = request.POST["latest_comment"]
         latest_bid = request.POST["latest_bid"]
         listing = Listing.objects.get(pk = name)
+        listing.current_bid = latest_bid
+        listing.save()
         
-        Bid(username = current_user, bid = latest_bid, bids_listing = listing ).save()
+        Bid(username = current_user.username, bid = latest_bid, bids_listing = listing ).save()
         
         if latest_comment != "":
-            Comment(username = current_user,comment = latest_comment ,comment_listing = listing).save()
+            Comment(username = current_user.username,comment = latest_comment ,comment_listing = listing).save()
 
         listing_bid = listing.relate_bid.all().last()
         make_bid = listing_bid.bid + 1
     
-        listing_watchlater = listing.relate_watchlater.filter(username = current_user)
+        listing_watchlater = listing.relate_watchlater.filter(username = current_user.username)
 
         return render(request, "auctions/listing.html", {
             "listing" : listing ,
@@ -158,21 +152,24 @@ def listing_page(request, name):
         }) 
 
     else :
+        a= "isha"
+        b= "isha"
         current_user = request.user
         listing = Listing.objects.get(pk = name)
         listing_bid = listing.relate_bid.all().last()
         make_bid = listing_bid.bid + 1
 
-        listing_watchlater = listing.relate_watchlater.filter(username = current_user)
+        listing_watchlater = listing.relate_watchlater.filter(username = current_user.username)
 
         if listing.active == False:
-            if current_user == listing_bid.username:
+            if current_user.username == listing_bid.username:
                 return render(request, "auctions/listing.html", {
                     "listing" : listing,
-                    "winning_bid" : listing_bid       
+                    "listing_bid" : listing_bid       
                 })
             else:
-                return HttpResponse(f"{listing_bid.username} won this")
+                return HttpResponse(f"%{listing_bid.username}% or %{current_user.username}% won this")
+                
         else:
             return render(request, "auctions/listing.html", {
                 "listing" : listing ,
@@ -216,13 +213,13 @@ def watchlater(request):
         
         listing_detail = Listing.objects.get(title = listing_title)
 
-        temp = listing_detail.relate_watchlater.filter(username = current_user).first()
+        temp = listing_detail.relate_watchlater.filter(username = current_user.username).first()
 
         if temp is not None:
             temp.delete()
             listing_bid = listing_detail.relate_bid.all().last()
             make_bid = listing_bid.bid + 1
-            listing_watchlater = listing_detail.relate_watchlater.filter(username = current_user)
+            listing_watchlater = listing_detail.relate_watchlater.filter(username = current_user.username)
             return render(request, "auctions/listing.html", {
                 "listing" : listing_detail ,
                 "listing_comments" : listing_detail.relate_comments.all()  ,
@@ -232,10 +229,10 @@ def watchlater(request):
                 "user_comments" : Comment.objects.all(),                
             })
         else:
-            Watchlater(username = current_user, watchlater_listing = listing_detail).save()
+            Watchlater(username = current_user.username, watchlater_listing = listing_detail).save()
             listing_bid = listing_detail.relate_bid.all().last()
             make_bid = listing_bid.bid + 1
-            listing_watchlater = listing_detail.relate_watchlater.filter(username = current_user)
+            listing_watchlater = listing_detail.relate_watchlater.filter(username = current_user.username)
             return render(request, "auctions/listing.html", {
                 "listing" : listing_detail ,
                 "listing_comments" : listing_detail.relate_comments.all()  ,
@@ -247,7 +244,7 @@ def watchlater(request):
        
     else:
         current_user = request.user
-        watchlater_list = Watchlater.objects.filter(username = current_user)
+        watchlater_list = Watchlater.objects.filter(username = current_user.username)
         
         l = []
         for list in watchlater_list:

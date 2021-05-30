@@ -8,49 +8,59 @@
         <img src = "/static/auctions/{{listing.imagename}}" style="height: 6cm;" alt="">
         <h5>Inital Price - $ {{listing.price}}</h5>
         <h5>Discription - {{listing.discription}}</h5>
-        <h5>Latest bid - $ {{listing_bid.bid}}</h5>
-        <div>
-            {% if user.is_authenticated %}
-                
-                {% if listing.masteruser == user.username %}
-                    <h1>
-                        <a href="{% url 'closed_listing' listing.title %}">Close Listing</a>
-                    </h1>
-                {% else %}
-                    <form action="{% url 'listing_page' listing.title %}" method="POST">
-                        {% csrf_token %}
-                        <input type="number" placeholder="bid here" min="{{make_bid}}" name="latest_bid" >
-                        <input type="text" placeholder="comment here" name="latest_comment" empty_value = "None">
-                        <input type="submit" value="BID" >
-                    </form>
-
-                    {% for comments in user_comments %}
-                        <small>{{comments.username}} - </small> <b>{{comments.comment}} </b><br>
-                    {% endfor %}
-
-                    {% if listingwatchlater %}
-                        <form action="{% url 'watchlater' %}" method="POST">
-                            {% csrf_token %}
-                                <button type="submit" value="{{listing.title}}" name="listing_title">
-                                    <h5>Remove From watchlater</h5>
-                                </button>
-                        </form>
-                    {% else %}
-                        <form action="{% url 'watchlater' %}" method="POST">
-                            {% csrf_token %}
-                                <button type="submit" value="{{listing.title}}" name="listing_title">
-                                    <h5>Add to watchlater</h5>
-                                </button>
-                            </form>
-                    {% endif %}
-
-                {% endif %}
-            
+        {% if listing.active %}
+            <h5>Latest bid - $ {{listing_bid.bid}}</h5>
+            {% if listing.category %}
+                <h6>Category - {{listing.category}}</h6>
             {% else %}
-                <h6>
-                    <a href="{% url 'login' %}">Sign In to Place Bid & comment</a>
-                </h6>
+                <h6>Category - Not Specified</h6>
             {% endif %}
+            
+            <div>
+                {% if user.is_authenticated %}
+                
+                    {% if listing.masteruser == user.username %}
+                        <h1>
+                            <a href="{% url 'closed_listing' listing.title %}">Close Listing</a>
+                        </h1>
+                    {% else %}
+                        <form action="{% url 'listing_page' listing.title %}" method="POST">
+                            {% csrf_token %}
+                            <input type="number" placeholder="bid here" min="{{make_bid}}" name="latest_bid" >
+                            <input type="text" placeholder="comment here" name="latest_comment" empty_value = "None">
+                            <input type="submit" value="BID" >
+                        </form>
 
-        </div>    
+                        {% for comments in user_comments %}
+                            <small>{{comments.username}} - </small> <b>{{comments.comment}} </b><br>
+                        {% endfor %}
+
+                        {% if listingwatchlater %}
+                            <form action="{% url 'watchlater' %}" method="POST">
+                                {% csrf_token %}
+                                    <button type="submit" value="{{listing.title}}" name="listing_title">
+                                        <h5>Remove From watchlater</h5>
+                                    </button>
+                            </form>
+                        {% else %}
+                            <form action="{% url 'watchlater' %}" method="POST">
+                                {% csrf_token %}
+                                    <button type="submit" value="{{listing.title}}" name="listing_title">
+                                        <h5>Add to watchlater</h5>
+                                    </button>
+                                </form>
+                        {% endif %}
+
+                    {% endif %}
+            
+                {% else %}
+                    <h6>
+                        <a href="{% url 'login' %}">Sign In to Place Bid & comment</a>
+                    </h6>
+                {% endif %}
+
+            </div>    
+        {% else %}
+            <h5>Congratulations {{user.username}}, you win this listing at {{listing_bid.bid}} </h5>
+        {% endif %}
     {% endblock %}
