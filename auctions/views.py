@@ -22,7 +22,6 @@ def index(request):
 # Login page definations
 def login_view(request):
     if request.method == "POST":
-
         # Attempt to sign user in
         username = request.POST["username"]
         password = request.POST["password"]
@@ -120,8 +119,8 @@ def new_listing(request):
             "form" : newform()                                        # sending newform to create_listing.html
         })
 
-# Listing page defination
-@login_required(login_url='/login')
+
+# Listing Page
 def listing_page(request, name):
     if request.method == "POST":
         current_user = request.user
@@ -134,7 +133,7 @@ def listing_page(request, name):
         
         Bid(username = current_user.username, bid = latest_bid, bids_listing = listing ).save()
         
-        if latest_comment != "":
+        if latest_comment != "":                                                                                    # Checking if user has commented
             Comment(username = current_user.username,comment = latest_comment ,comment_listing = listing).save()
 
         listing_bid = listing.relate_bid.all().last()
@@ -168,7 +167,7 @@ def listing_page(request, name):
                     "listing_bid" : listing_bid       
                 })
             else:
-                return HttpResponse(f"%{listing_bid.username}% or %{current_user.username}% won this")
+                return HttpResponse(f"{listing_bid.username}  won this")
                 
         else:
             return render(request, "auctions/listing.html", {
@@ -192,7 +191,6 @@ def closed_listing(request, name):
     
 
 # Listing based on categories
-@login_required(login_url='/login')
 def categories(request):
     if request.method == "POST":
         category = request.POST["category"]
